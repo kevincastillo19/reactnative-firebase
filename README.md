@@ -20,5 +20,3 @@ yarn install
 ```
 
 ### Happy Coding 🚀
-
-### [ReactNativeMarket.com](http://reactnativemarket.com/)
