@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View, Alert } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -10,6 +10,7 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
+import Firebase from '../FirebaseConfig'
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -23,17 +24,39 @@ export default function LoginScreen({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],
-    })
+
+    Firebase.auth()
+            .signInWithEmailAndPassword(email.value, password.value)
+            .then(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Dashboard' }],
+              })
+            })
+            .catch(error => {     
+              Alert.alert(
+                "Error",
+                error.message,
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ]
+              );         
+              console.log(error)
+            })    
+
   }
 
   return (
-    <Background>
+    <View style={styles.grayBackground}>
       <BackButton goBack={navigation.goBack} />
-      <Logo />
+      <View style={styles.center}>
       <Header>Welcome back.</Header>
+      </View>
       <TextInput
         label="Email"
         returnKeyType="next"
@@ -66,12 +89,12 @@ export default function LoginScreen({ navigation }) {
         Login
       </Button>
       <View style={styles.row}>
-        <Text>Don’t have an account? </Text>
+        <Text style={styles.textBelow}>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
           <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
       </View>
-    </Background>
+    </View>
   )
 }
 
@@ -83,14 +106,28 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    marginTop: 4,
+    marginTop: 4,        
   },
   forgot: {
     fontSize: 13,
-    color: theme.colors.secondary,
+    color: theme.colors.white,
   },
   link: {
     fontWeight: 'bold',
     color: theme.colors.primary,
   },
+  grayBackground:{    
+    padding:50,
+    width:'100%',
+    height:'100%',
+    backgroundColor:theme.colors.grayBackground
+  },
+  center:{
+    textAlign:'center',
+    marginHorizontal:'auto',
+    marginTop:10
+  },
+  textBelow:{
+    color:'#fff'
+  }
 })

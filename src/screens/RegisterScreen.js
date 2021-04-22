@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -11,7 +11,7 @@ import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import { nameValidator } from '../helpers/nameValidator'
-
+import Firebase from '../FirebaseConfig'
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -26,17 +26,36 @@ export default function RegisterScreen({ navigation }) {
       setEmail({ ...email, error: emailError })
       setPassword({ ...password, error: passwordError })
       return
-    }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],
-    })
+    }    
+    Firebase.auth()
+            .createUserWithEmailAndPassword(email.value, password.value)
+            .then(() => {              
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Dashboard' }],
+                })
+              })
+            .catch(error => {
+              console.log(error)
+              Alert.alert(
+                "Error",
+                error.message,
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                  { text: "OK", onPress: () => console.log("OK Pressed") }
+                ]
+              );
+          
+            })
   }
 
   return (
-    <Background>
+    <View style={styles.grayBackground}>
       <BackButton goBack={navigation.goBack} />
-      <Logo />
       <Header>Create Account</Header>
       <TextInput
         label="Name"
@@ -75,12 +94,12 @@ export default function RegisterScreen({ navigation }) {
         Sign Up
       </Button>
       <View style={styles.row}>
-        <Text>Already have an account? </Text>
+        <Text style={styles.textWhite}>Already have an account? </Text>
         <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
           <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>
-    </Background>
+    </View>
   )
 }
 
@@ -93,4 +112,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.primary,
   },
+  grayBackground:{    
+    padding:50,
+    width:'100%',
+    height:'100%',
+    backgroundColor:theme.colors.grayBackground
+  },
+  textWhite:{
+    color:'#fff'
+  }
 })

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Simple Login Template",
-    "slug": "simple-login-template",
+    "name": "Simple Login firebase",
+    "slug": "simple-login-firebase",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "expo.reactnativefirebase"
     },
     "web": {
       "favicon": "./assets/favicon.png"
